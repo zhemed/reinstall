@@ -1157,11 +1157,7 @@ setos() {
         is_virt && flavour=virt || flavour=lts
 
         # 不要用https 因为甲骨文云arm initramfs阶段不会从硬件同步时钟，导致访问https出错
-        if is_in_china; then
-            mirror=http://mirror.nju.edu.cn/alpine/v$releasever
-        else
-            mirror=http://dl-cdn.alpinelinux.org/alpine/v$releasever
-        fi
+        mirror=http://dl-cdn.alpinelinux.org/alpine/v$releasever
         eval ${step}_vmlinuz=$mirror/releases/$basearch/netboot/vmlinuz-$flavour
         eval ${step}_initrd=$mirror/releases/$basearch/netboot/initramfs-$flavour
         eval ${step}_modloop=$mirror/releases/$basearch/netboot/modloop-$flavour
@@ -1212,34 +1208,18 @@ Continue?
                 # https://github.com/tuna/issues/issues/1999
                 # nju 也没同步
                 udeb_mirror=deb.freexian.com/extended-lts
-                deb_mirror=mirror.nju.edu.cn/debian-elts
-                initrd_mirror=mirror.nju.edu.cn/debian-archive/debian
-            else
-                # 按道理不应该用官方源，但找不到其他源
-                udeb_mirror=deb.freexian.com/extended-lts
                 deb_mirror=deb.freexian.com/extended-lts
                 initrd_mirror=archive.debian.org/debian
             fi
         else
-            if is_in_china; then
-                # ftp.cn.debian.org 不在国内还严重丢包
-                # https://www.itdog.cn/ping/ftp.cn.debian.org
-                mirror=mirror.nju.edu.cn/debian
-            else
-                mirror=deb.debian.org/debian # fastly
-            fi
+            mirror=deb.debian.org/debian # fastly
             udeb_mirror=$mirror
             deb_mirror=$mirror
             initrd_mirror=$mirror
         fi
 
         # 云镜像和 firmware 下载源
-        if is_in_china; then
-            cdimage_mirror=https://mirror.nju.edu.cn/debian-cdimage
-        else
-            cdimage_mirror=https://cdimage.debian.org/images # 在瑞典，不是 cdn
-            # cloud.debian.org 同样在瑞典，不是 cdn
-        fi
+        cdimage_mirror=https://cdimage.debian.org/images # 在瑞典，不是 cdn
 
         is_virt && flavour=-cloud || flavour=
         # debian 10 云内核 vultr efi vnc 没有显示
@@ -1280,13 +1260,9 @@ Continue?
             :
         else
             # 传统安装
-            if is_in_china; then
-                hostname=mirror.nju.edu.cn
-            else
-                # http.kali.org 没有 ipv6 地址
-                # http.kali.org (geoip 重定向) 到 kali.download (cf)
-                hostname=kali.download
-            fi
+            # http.kali.org 没有 ipv6 地址
+            # http.kali.org (geoip 重定向) 到 kali.download (cf)
+            hostname=kali.download
             codename=kali-rolling
             mirror=http://$hostname/kali/dists/$codename/main/installer-$basearch_alt/current/images/netboot/debian-installer/$basearch_alt
 
@@ -1314,17 +1290,7 @@ Continue?
 
         if is_use_cloud_image; then
             # cloud image
-            if is_in_china; then
-                # 有的源没有 releases 镜像
-                # https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/releases/
-                #   https://unicom.mirrors.ustc.edu.cn/ubuntu-cloud-images/releases/
-                #            https://mirror.nju.edu.cn/ubuntu-cloud-images/releases/
-
-                # mirrors.cloud.tencent.com
-                ci_mirror=https://mirror.nju.edu.cn/ubuntu-cloud-images
-            else
-                ci_mirror=https://cloud-images.ubuntu.com
-            fi
+            ci_mirror=https://cloud-images.ubuntu.com
 
             # 以下版本有 minimal 镜像
             # amd64 所有
@@ -1349,17 +1315,10 @@ Continue?
             fi
         else
             # 传统安装
-            if is_in_china; then
-                case "$basearch" in
-                "x86_64") mirror=https://mirror.nju.edu.cn/ubuntu-releases/$releasever ;;
-                "aarch64") mirror=https://mirror.nju.edu.cn/ubuntu-cdimage/releases/$releasever/release ;;
-                esac
-            else
-                case "$basearch" in
-                "x86_64") mirror=https://releases.ubuntu.com/$releasever ;;
-                "aarch64") mirror=https://cdimage.ubuntu.com/releases/$releasever/release ;;
-                esac
-            fi
+            case "$basearch" in
+            "x86_64") mirror=https://releases.ubuntu.com/$releasever ;;
+            "aarch64") mirror=https://cdimage.ubuntu.com/releases/$releasever/release ;;
+            esac
 
             # iso
             filename=$(curl -L $mirror/ | grep -oP "ubuntu-$releasever.*?-live-server-$basearch_alt.iso" |
@@ -1377,18 +1336,10 @@ Continue?
 
     setos_arch() {
         if [ "$basearch" = "x86_64" ]; then
-            if is_in_china; then
-                mirror=https://mirror.nju.edu.cn/archlinux
-            else
-                mirror=https://geo.mirror.pkgbuild.com # geoip
-            fi
+            mirror=https://geo.mirror.pkgbuild.com # geoip
         else
-            if is_in_china; then
-                mirror=https://mirror.nju.edu.cn/archlinuxarm
-            else
-                # https 证书有问题
-                mirror=http://mirror.archlinuxarm.org # geoip
-            fi
+            # https 证书有问题
+            mirror=http://mirror.archlinuxarm.org # geoip
         fi
 
         if is_use_cloud_image; then
@@ -1406,11 +1357,7 @@ Continue?
     }
 
     setos_nixos() {
-        if is_in_china; then
-            mirror=https://mirror.nju.edu.cn/nix-channels
-        else
-            mirror=https://nixos.org/channels
-        fi
+        mirror=https://nixos.org/channels
 
         if is_use_cloud_image; then
             :
@@ -1424,11 +1371,7 @@ Continue?
     }
 
     setos_gentoo() {
-        if is_in_china; then
-            mirror=https://mirror.nju.edu.cn/gentoo
-        else
-            mirror=https://distfiles.gentoo.org # cdn77
-        fi
+        mirror=https://distfiles.gentoo.org # cdn77
 
         dir=releases/$basearch_alt/autobuilds
 
@@ -1461,11 +1404,7 @@ Continue?
         #          https://mirrors.ustc.edu.cn/opensuse/ports/aarch64/tumbleweed/appliances/
         # https://mirrors.tuna.tsinghua.edu.cn/opensuse/ports/aarch64/tumbleweed/appliances/
 
-        if is_in_china; then
-            mirror=https://mirror.nju.edu.cn/opensuse
-        else
-            mirror=https://downloadcontentcdn.opensuse.org
-        fi
+        mirror=https://downloadcontentcdn.opensuse.org
 
         if [ "$releasever" = tumbleweed ]; then
             # tumbleweed
@@ -1647,12 +1586,8 @@ Continue with DD?
     }
 
     setos_aosc() {
-        if is_in_china; then
-            mirror=https://mirror.nju.edu.cn/anthon/aosc-os
-        else
-            # 服务器在香港
-            mirror=https://releases.aosc.io
-        fi
+        # 服务器在香港
+        mirror=https://releases.aosc.io
 
         dir=os-$basearch_alt/base
         file=$(curl -L $mirror/$dir/ | grep -oP 'aosc-os_base_.*?\.tar.xz' |
@@ -1679,21 +1614,12 @@ Continue with DD?
 
         if is_use_cloud_image; then
             # ci
-            if is_in_china; then
-                case $distro in
-                centos) ci_mirror="https://mirror.nju.edu.cn/centos-cloud/centos" ;;
-                almalinux) ci_mirror="https://mirror.nju.edu.cn/almalinux/$releasever/cloud/$elarch/images" ;;
-                rocky) ci_mirror="https://mirror.nju.edu.cn/rocky/$releasever/images/$elarch" ;;
-                fedora) ci_mirror="https://mirror.nju.edu.cn/fedora/releases/$releasever/Cloud/$elarch/images" ;;
-                esac
-            else
-                case $distro in
-                centos) ci_mirror="https://cloud.centos.org/centos" ;;
-                almalinux) ci_mirror="https://repo.almalinux.org/almalinux/$releasever/cloud/$elarch/images" ;;
-                rocky) ci_mirror="https://download.rockylinux.org/pub/rocky/$releasever/images/$elarch" ;;
-                fedora) ci_mirror="https://d2lzkl7pfhq30w.cloudfront.net/pub/fedora/linux/releases/$releasever/Cloud/$elarch/images" ;;
-                esac
-            fi
+            case $distro in
+            centos) ci_mirror="https://cloud.centos.org/centos" ;;
+            almalinux) ci_mirror="https://repo.almalinux.org/almalinux/$releasever/cloud/$elarch/images" ;;
+            rocky) ci_mirror="https://download.rockylinux.org/pub/rocky/$releasever/images/$elarch" ;;
+            fedora) ci_mirror="https://d2lzkl7pfhq30w.cloudfront.net/pub/fedora/linux/releases/$releasever/Cloud/$elarch/images" ;;
+            esac
             case $distro in
             centos)
                 case $releasever in
@@ -2927,19 +2853,11 @@ install_grub_linux_efi() {
         # fedora 43 efi 在 vultr 无法引导 debain 9/10 netboot
         fedora_ver=$(get_latest_distro_releasever fedora)
 
-        if is_in_china; then
-            mirror=https://mirror.nju.edu.cn/fedora
-        else
-            mirror=https://d2lzkl7pfhq30w.cloudfront.net/pub/fedora/linux
-        fi
+        mirror=https://d2lzkl7pfhq30w.cloudfront.net/pub/fedora/linux
 
         curl -Lo $tmp/$grub_efi $mirror/releases/$fedora_ver/Everything/$basearch/os/EFI/BOOT/$grub_efi
     else
-        if is_in_china; then
-            mirror=https://mirror.nju.edu.cn/opensuse
-        else
-            mirror=https://downloadcontentcdn.opensuse.org
-        fi
+        mirror=https://downloadcontentcdn.opensuse.org
 
         [ "$basearch" = x86_64 ] && ports='' || ports=/ports/$basearch
 
@@ -2955,8 +2873,8 @@ download_and_extract_apk() {
     local extract_dir=$3
 
     install_pkg tar xz
-    is_in_china && mirror=http://mirror.nju.edu.cn/alpine || mirror=https://dl-cdn.alpinelinux.org/alpine
-    package_apk=$(curl -L $mirror/v$alpine_ver/main/$basearch/ | grep -oP "$package-[^-]*-[^-]*\.apk" | sort -u)
+    mirror=https://dl-cdn.alpinelinux.org/alpine
+    package_apk=$(curl -L $mirror/v$alpine_ver/main/$basearch/ | grep -oP "$package-[^-]*-[^-]*\\.apk" | sort -u)
     if ! [ "$(wc -l <<<"$package_apk")" -eq 1 ]; then
         error_and_exit "find no/multi apks."
     fi
@@ -2978,8 +2896,7 @@ install_grub_win() {
     # 有可能重定义到一个拉黑了部分 IP 的服务器
 
     # 换成 ftp.gnu.org?
-    is_in_china && grub_url=https://mirror.nju.edu.cn/gnu/grub/grub-$grub_ver-for-windows.zip ||
-        grub_url=https://mirrors.kernel.org/gnu/grub/grub-$grub_ver-for-windows.zip
+    grub_url=https://mirrors.kernel.org/gnu/grub/grub-$grub_ver-for-windows.zip
     curl -Lo $tmp/grub.zip $grub_url
     # unzip -qo $tmp/grub.zip
     7z x $tmp/grub.zip -o$tmp -r -y -xr!i386-efi -xr!locale -xr!themes -bso0
@@ -3032,7 +2949,7 @@ install_grub_win() {
         if false; then
             # g2ldr.mbr
             # 部分国内机无法访问 ftp.cn.debian.org
-            is_in_china && host=mirror.nju.edu.cn || host=deb.debian.org
+            host=deb.debian.org
             curl -LO http://$host/debian/tools/win32-loader/oldstable/win32-loader.exe
             7z x win32-loader.exe 'g2ldr.mbr' -o$tmp/win32-loader -r -y -bso0
             find $tmp/win32-loader -name 'g2ldr.mbr' -exec cp {} /cygdrive/$c/ \;
